@@ -42,11 +42,18 @@ app.use('/js', express.static(path.join(__dirname, 'node_modules', 'popper.js', 
 // si no encuentra archivos en /public/js los busca donde le indico el .use('/js',...)
 app.use('/js', express.static(path.join(__dirname, 'node_modules', 'jquery', 'dist')));
 
+// seteo adonde van a estar las views
+app.set('views', path.join('./', 'src', 'views'));
+
+// seteo el view engine
+app.set('view engine', 'ejs');
+
 app.get('/', (req, res) => {
   // res.send('Hello from my library app :)')// solo muestra en pantalla el mensaje
   // res.sendFile(__dirname + '/views/index.html')
   // envio un html __dirname da un string con el path de la carpeta padre de donde esta este archvo
-  res.sendFile(path.join(__dirname, 'views', 'index.html')); // hecho con path
+  // res.sendFile(path.join(__dirname, 'views', 'index.html')); // hecho con path
+  res.render('index', { list: ['a', 'b'], title: 'Library' });
 });
 
 // le digo en que puerto va a estar dependiendo si en desarrollo o production
