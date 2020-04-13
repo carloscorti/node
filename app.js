@@ -20,19 +20,23 @@ app.set('views', path.join('./', 'src', 'views'));
 
 app.set('view engine', 'ejs');
 
-// importo el modulo con el las rutas de los libros
-const bookRouter = require('./src/routes/bookRouter');
+// defino la configuracion de nav que le voy a pasar el router
+const nav = [
+  { link: '/books', title: 'Books' },
+  { link: '/authors', title: 'Authors' }
+];
 
-app.use('/books', bookRouter);
+// importo el modulo con el las rutas de los libros y paso nav como parmetro
+// ya que bookRouter.js devuelve una funcion que esopera un argumento
+const bookRouter = require('./src/routes/bookRouter')(nav);
+
+app.use(nav[0].link, bookRouter);
 
 app.get('/', (req, res) => {
   res.render(
     'index',
     {
-      nav: [
-        { link: '/books', title: 'Books' },
-        { link: '/authors', title: 'Authors' }
-      ],
+      nav,
       title: 'Library'
     }
   );
