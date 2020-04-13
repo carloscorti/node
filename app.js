@@ -22,13 +22,62 @@ app.set('views', path.join('./', 'src', 'views'));
 
 app.set('view engine', 'ejs');
 
+const books = [
+  {
+    title: 'War and Peace',
+    genre: 'Historical Fiction',
+    author: 'Lev Tolstoy',
+    read: false
+  },
+  {
+    title: 'Les Miserables',
+    genre: 'Historical Fiction',
+    author: 'Victor Hugo',
+    read: false
+  },
+  {
+    title: 'The time Machine',
+    genre: 'Science Fiction',
+    author: 'H. G. Wells',
+    read: true
+  },
+  {
+    title: 'A junrey into the center of the earth',
+    genre: 'Science Fiction',
+    author: 'Jules Verne',
+    read: false
+  },
+  {
+    title: 'The dark world',
+    genre: 'Fantasy',
+    author: 'Henry Kuttner',
+    read: false
+  },
+  {
+    title: 'The wind in the Willows',
+    genre: 'Fantasy',
+    author: 'Kenneth Grahame',
+    read: false
+  }
+];
+
 // le digo a la app desde donde voy a usar la ruta del router bookRouter
 app.use('/books', bookRouter);
 // defino un ruta de bookRouter y su accion, la raiz sera con lo que defini el uso de bookRouter
 // osea aqui la accion se va a dar en el url /books/
 bookRouter.route('/')
   .get((req, res) => {
-    res.send('books section :) <a href="/">Returno to main</a><br><a href="/books/single">Go to Single</a>');
+    res.render(
+      'books',
+      {
+        nav: [
+          { link: '/books', title: 'Books' },
+          { link: '/authors', title: 'Authors' }
+        ],
+        books,
+        title: 'Library'
+      }
+    );
   });
 // defino un ruta de bookRouter y su accion, la raiz sera con lo que defini el uso de bookRouter
 // osea aqui la accionb se va a dar en el url /books/single
