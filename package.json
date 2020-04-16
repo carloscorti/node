@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "set DEBUG=app & node app.js",
-    "startdev": "set DEBUG=app & nodemon app.js",
+    "startdev": "set DEBUG=app:* & nodemon app.js",
     "lint": "eslint app.js"
   },
   "author": "",
@@ -19,6 +19,7 @@
     "express": "4.17.1",
     "jquery": "3.5.0",
     "morgan": "1.10.0",
+    "mysql": "2.18.1",
     "nodemon": "2.0.3"
   },
   "devDependencies": {
