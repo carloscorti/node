@@ -1,7 +1,6 @@
 const express = require('express');
-const mysql = require('mysql');
+// const mysql = require('mysql');
 const debug = require('debug')('app:bookRouter');
-
 
 const config = {
   host: 'localhost',
@@ -10,54 +9,37 @@ const config = {
   password: 'nodelibrary'
 };
 
-class Database {
-  constructor(conf) {
-    this.connection = mysql.createConnection(conf);
-  }
-
-  connect() {
-    return new Promise((resolve, reject) => {
-      this.connection.connect((err) => {
-        if (err) {
-          debug(`error connecting: ${err.stack}`);
-          return reject(err);
-        }
-        debug(`connected as id ${this.connection.threadId}`);
-        return resolve();
-      });
-    });
-  }
-
-  query(sql, args) {
-    return new Promise((resolve, reject) => {
-      this.connection.query(sql, args, (err, rows) => {
-        if (err) {
-          return reject(err);
-        }
-        return resolve(rows);
-      });
-    });
-  }
-
-  close() {
-    return new Promise((resolve, reject) => {
-      this.connection.end((err) => {
-        if (err) {
-          return reject(err);
-        }
-        return resolve();
-      });
-    });
-  }
-}
+const Database = require('./mysqlpromiseconect.js')();
 
 const db = new Database(config);
-db.connect()
-  .then(() => db.close())
-  .catch((err) => debug(`There was an error :( ${err}`));
 
+(async (dbase) => {
+  try {
+    // const db = new Database(conf);
+    await dbase.connect();
+    await dbase.close();
+  } catch (err) {
+    debug(`There was an error :( ${err}`);
+  }
+})(db);
 
-// lo defino como una funcion para configuraciones dinamicas pasando argumentos
+// async function cnt(dbase) {
+//   try {
+//     // const db = new Database(conf);
+//     await dbase.connect();
+//     await dbase.close();
+//   } catch (err) {
+//     debug(`There was an error :( ${err}`);
+//   }
+// }
+// cnt(db);
+// (async () => { await cnt(db); })();
+
+// const db = new Database(config);
+// db.connect()
+//   .then(() => db.close())
+//   .catch((err) => debug(`There was an error :( ${err}`));
+
 function router(nav) {
   const bookRouter = express.Router();
 
