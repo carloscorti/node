@@ -20,6 +20,14 @@ app.set('views', path.join('./', 'src', 'views'));
 
 app.set('view engine', 'ejs');
 
+// defino la configutracion de coneccion
+const config = {
+  host: 'localhost',
+  database: 'pslibrary',
+  user: 'nodelibrary',
+  password: 'nodelibrary'
+};
+
 // defino la configuracion de nav que le voy a pasar el router
 const nav = [
   { link: '/books', title: 'Books' },
@@ -28,7 +36,7 @@ const nav = [
 
 // importo el modulo con el las rutas de los libros y paso nav como parmetro
 // ya que bookRouter.js devuelve una funcion que esopera un argumento
-const bookRouter = require('./src/routes/bookRouter')(nav);
+const bookRouter = require('./src/routes/bookRouter')(nav, config);
 
 app.use(nav[0].link, bookRouter);
 

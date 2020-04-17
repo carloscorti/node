@@ -26,6 +26,8 @@ function mysqlconnection() {
           if (err) {
             return reject(err);
           }
+          debug('Query succeded');
+          debug(`connected as id ${this.connection.threadId}`);
           return resolve(rows);
         });
       });
