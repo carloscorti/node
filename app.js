@@ -23,7 +23,8 @@ app.set('view engine', 'ejs');
 // defino la configuracion de nav que le voy a pasar el router
 const nav = [
   { link: '/books', title: 'Books' },
-  { link: '/authors', title: 'Authors' }
+  { link: '/authors', title: 'Authors' },
+  { link: '/admin', title: 'Admin' }
 ];
 
 // importo el modulo con el las rutas de los libros y paso nav como parmetro
@@ -31,6 +32,10 @@ const nav = [
 const bookRouter = require('./src/routes/bookRouter')(nav);
 
 app.use(nav[0].link, bookRouter);
+
+const adminRouter = require('./src/routes/adminRouter')();
+
+app.use(nav[2].link, adminRouter);
 
 app.get('/', (req, res) => {
   res.render(
