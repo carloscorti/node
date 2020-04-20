@@ -6,25 +6,35 @@ const authRouter = express.Router();
 function router() {
   authRouter.route('/signUp')
     .post((req, res) => {
-      debug(req.body);
-      // para crear un user, tomo el username y password de req.body
-      // .login me lo agrega a req app.use(passport.initialize()) en passport.js
-      // al invocarlo en app.js con require('./src/config/passport.js')(app);
-      // aca logueo el user y luego redirijo para mostrar el user ya creado
-      // para loguear passport usa el .serializeUser de passport.js para agregarlo a la session
-      req.login(req.body, () => {
-        // redirecciona a auth/profile
-        res.redirect('/auth/profile');
-      });
+      const url = 'mongodb://localhost:27017';
+      const dbName = 'libraryApp';
+      (async function addUser() {
+        const { username, password } = req.body;
+        const user = { username, password };
+        let client;
+        try {
+          client = await MongoClient.connect(url, { useUnifiedTopology: true });
+          debug('Server connected');
+
+          const db = client.db(dbName);
+
+          const response = await db.collection('users').insertOne(user);
+
+          req.login(response.ops[0], () => {
+            res.redirect('/auth/profile');
+          });
+        } catch (err) {
+          debug(err.stack);
+        } finally {
+          await client.close();
+          debug('Connection closed');
+        }
+      }());
     });
 
   authRouter.route('/profile')
     .get((req, res) => {
-      debug(req.user);
-      // password me adjunta el user creado a la request (al req)
-      // aca muestro el user creado con req.login del .post
-      // usa .deserializeUser de passport.js para sacar el user de la session
-      // crear al usuario y poder mostrarlo
+      // req es response.ops[0]
       res.json(req.user);
     });
 
@@ -32,5 +42,4 @@ function router() {
   return authRouter;
 }
 
-// el modulo exporta la funcion que devuelve el router
 module.exports = router;
