@@ -3,10 +3,21 @@ const chalk = require('chalk');
 const debug = require('debug')('app');
 const morgan = require('morgan');
 const path = require('path');
+// para que el body de los post este dentro de la request (req)
+const bodyParser = require('body-parser');
+
 
 const app = express();
 
 app.use(morgan('tiny'));
+// uso el bodyParser en la app
+// importa el lugar donde lo invoque, no puedo hcerlo despues de los router
+// con esto toma el posto y lo pone en request --> req.body
+// en req.body esta el post form
+// app.use(bodyParser.json()), lo usa como middleware para pasar el body a json
+//    -si esta asi app.use(bodyParser.json) va a trabar la aplicacion porque espera next()
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -24,7 +35,6 @@ app.set('view engine', 'ejs');
 const nav = [
   { link: '/books', title: 'Books' },
   { link: '/authors', title: 'Authors' },
-  { link: '/admin', title: 'Admin' }
 ];
 
 // importo el modulo con el las rutas de los libros y paso nav como parmetro
@@ -35,7 +45,11 @@ app.use(nav[0].link, bookRouter);
 
 const adminRouter = require('./src/routes/adminRouter')();
 
-app.use(nav[2].link, adminRouter);
+app.use('/admin', adminRouter);
+
+const authRouter = require('./src/routes/authRouter')();
+
+app.use('/auth', authRouter);
 
 app.get('/', (req, res) => {
   res.render(
