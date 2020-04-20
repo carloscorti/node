@@ -3,21 +3,29 @@ const chalk = require('chalk');
 const debug = require('debug')('app');
 const morgan = require('morgan');
 const path = require('path');
-// para que el body de los post este dentro de la request (req)
 const bodyParser = require('body-parser');
-
+// passport mantiene el object user en la session
+// utiliza las cookies y las utiliza en la session
+// const passport = require('passport');
+// para incluir las cookies dentro de la request (del req)
+// lo necesitamos para usar passport
+const cookieParser = require('cookie-parser');
+// para crear sessions, lo necesitamos para passport
+const session = require('express-session');
 
 const app = express();
 
 app.use(morgan('tiny'));
-// uso el bodyParser en la app
-// importa el lugar donde lo invoque, no puedo hcerlo despues de los router
-// con esto toma el posto y lo pone en request --> req.body
-// en req.body esta el post form
-// app.use(bodyParser.json()), lo usa como middleware para pasar el body a json
-//    -si esta asi app.use(bodyParser.json) va a trabar la aplicacion porque espera next()
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+// invoco y llamo al cookieParser como middleware
+app.use(cookieParser());
+// invoco y llamo a session como middleware
+// { secret: 'library' } se usa para contruir la cookie
+app.use(session({ secret: 'library' }));
+
+// configuracion de passport
+require('./src/config/passport.js')(app);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
