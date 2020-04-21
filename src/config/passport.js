@@ -5,7 +5,8 @@ const passport = require('passport');
 // en teste caso uso estrategia de autenticacion local con user y password
 // con package 'passport-local'
 // podria hacerlo con google, facebook, tweeter, linkdin, etc
-require('./strategies/local.strategy.js');
+// hay que ejectutar la strategy ya que es importada como una funcion
+require('./strategies/local.strategy.js')();
 
 function passportConfig(app) {
   // https://stackoverflow.com/questions/46644366/what-is-passport-initialize-nodejs-express

@@ -55,7 +55,7 @@ const adminRouter = require('./src/routes/adminRouter')();
 
 app.use('/admin', adminRouter);
 
-const authRouter = require('./src/routes/authRouter')();
+const authRouter = require('./src/routes/authRouter')(nav);
 
 app.use('/auth', authRouter);
 
