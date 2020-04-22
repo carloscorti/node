@@ -14,23 +14,27 @@ function router(nav) {
       (async function addUser() {
         const { username, password } = req.body;
         const user = { username, password };
-        let client;
-        try {
-          client = await MongoClient.connect(url, { useUnifiedTopology: true });
-          debug('Server connected');
+        if (user.username) {
+          let client;
+          try {
+            client = await MongoClient.connect(url, { useUnifiedTopology: true });
+            debug('Server connected');
 
-          const db = client.db(dbName);
+            const db = client.db(dbName);
 
-          const response = await db.collection('users').insertOne(user);
+            const response = await db.collection('users').insertOne(user);
 
-          req.login(response.ops[0], () => {
-            res.redirect('/auth/profile');
-          });
-        } catch (err) {
-          debug(err.stack);
-        } finally {
-          await client.close();
-          debug('Connection closed');
+            req.login(response.ops[0], () => {
+              res.redirect('/auth/profile');
+            });
+          } catch (err) {
+            debug(err.stack);
+          } finally {
+            await client.close();
+            debug('Connection closed');
+          }
+        } else {
+          res.redirect('/');
         }
       }());
     });
