@@ -7,6 +7,7 @@ const passport = require('passport');
 const authRouter = express.Router();
 function router(nav) {
   authRouter.route('/signUp')
+    .get((req, res) => { res.redirect('/'); })
     .post((req, res) => {
       const url = 'mongodb://localhost:27017';
       const dbName = 'libraryApp';
@@ -35,14 +36,20 @@ function router(nav) {
     });
 
   authRouter.route('/signIn')
+    // si un usuario se registro local strategy agrego user a req
+    // si es asi no muestra la pagina signin signup
     .get((req, res) => {
-      res.render(
-        'signin',
-        {
-          nav,
-          title: 'Sign In',
-        }
-      );
+      if (req.user) {
+        res.redirect(nav[0].link);
+      } else {
+        res.render(
+          'signin',
+          {
+            nav,
+            title: 'Sign In',
+          }
+        );
+      }
     })
 
     // le paso los datos a password para authenticate password.authenticate()
@@ -56,10 +63,48 @@ function router(nav) {
       }));
 
   authRouter.route('/profile')
+    // utilizo un middleware para que cada vez que llegue a '.../profile'
+    // verifique si la validacion devolvio un usuario en local.strategy,js
+    // si devolvio es que el usuario esta en la base de datos
+    // sino no esta registrado y por lo tando lo devuelve '.../' que es signUp singIn
+    .all((req, res, next) => {
+      if (req.user) {
+        debug(req.user);
+        next();
+      } else {
+        debug('redirigio');
+        res.redirect('/');
+      }
+    })
+
     .get((req, res) => {
-      // req es response.ops[0]
+      // req.user es response.ops[0]
       // y cuando redirije successRedirect: '/auth/profile', es userToCkeck
-      res.json(req.user);
+      res.render(
+        'profile',
+        {
+          nav,
+          title: nav[1].title,
+          user: req.user,
+        }
+      );
+    });
+
+  authRouter.route('/logout')
+    .all((req, res, next) => {
+      if (req.user) {
+        debug('logout')
+        debug(req.user);
+        next();
+      } else {
+        debug('redirigio');
+        res.redirect('/');
+      }
+    })
+
+    .get((req, res) => {
+      req.logout();
+      res.redirect('/');
     });
 
 

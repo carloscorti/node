@@ -42,7 +42,7 @@ app.set('view engine', 'ejs');
 // defino la configuracion de nav que le voy a pasar el router
 const nav = [
   { link: '/books', title: 'Books' },
-  { link: '/authors', title: 'Authors' },
+  { link: '/auth/profile', title: 'Profile' },
 ];
 
 // importo el modulo con el las rutas de los libros y paso nav como parmetro
@@ -51,22 +51,30 @@ const bookRouter = require('./src/routes/bookRouter')(nav);
 
 app.use(nav[0].link, bookRouter);
 
+/* es solo para cargar datos en mongodb
 const adminRouter = require('./src/routes/adminRouter')();
 
 app.use('/admin', adminRouter);
+*/
 
 const authRouter = require('./src/routes/authRouter')(nav);
 
 app.use('/auth', authRouter);
 
 app.get('/', (req, res) => {
-  res.render(
-    'index',
-    {
-      nav,
-      title: 'Library'
-    }
-  );
+  // si un usuario se registro local strategy agrego user a req
+  // si es asi no muestra la pagina signin signup
+  if (req.user) {
+    res.redirect(nav[0].link);
+  } else {
+    res.render(
+      'index',
+      {
+        nav,
+        title: 'Welcome to Library'
+      }
+    );
+  }
 });
 
 const port = process.env.PORT || 3000;

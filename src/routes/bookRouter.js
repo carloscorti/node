@@ -5,6 +5,20 @@ const debug = require('debug')('app:bookRouter');
 // lo defino como una funcion para configuraciones dinamicas pasando argumentos
 function router(nav) {
   const bookRouter = express.Router();
+  // lo utilizo como middleware de todas las rutas de bookRouter
+  // para que cada vez que llegue a '.../profile'
+  // verifique si la validacion devolvio un usuario en local.strategy,js
+  // si devolvio es que el usuario esta en la base de datos
+  // sino no esta registrado y por lo tando lo devuelve '.../' que es signUp singIn
+  bookRouter.use((req, res, next) => {
+    if (req.user) {
+      debug(req.user);
+      next();
+    } else {
+      debug('redirigio');
+      res.redirect('/');
+    }
+  });
 
   bookRouter.route('/')
     .get((req, res) => {

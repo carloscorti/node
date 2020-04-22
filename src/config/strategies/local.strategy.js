@@ -42,7 +42,7 @@ function localStrategy() {
 
           // comparo password es el argumento de la funcion
           // que es el ingresado por el usuario en signin
-          if (userToCheck.password === password) {
+          if (userToCheck && userToCheck.password === password) {
             // done(err, succes)
             // err lo paso como null
             // si esta bien paso el usuario de la base de datos para hacer el perfil
