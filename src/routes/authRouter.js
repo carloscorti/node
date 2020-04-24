@@ -1,43 +1,20 @@
 const express = require('express');
-const { MongoClient } = require('mongodb');
 const debug = require('debug')('app:authRouter');
-// para autenticar los datos de signin
 const passport = require('passport');
+
+const userController = require('../controllers/userController');
+
+// importo userAuthenticationController
+const userAuthenticationController = require('../controllers/userAuthenticationControler');
 
 const authRouter = express.Router();
 function router(nav) {
+  const { userSignUp } = userController();
+  const { userAuthenticationMiddleware } = userAuthenticationController();
+
   authRouter.route('/signUp')
     .get((req, res) => { res.redirect('/'); })
-    .post((req, res) => {
-      const url = 'mongodb://localhost:27017';
-      const dbName = 'libraryApp';
-      (async function addUser() {
-        const { username, password } = req.body;
-        const user = { username, password };
-        if (user.username) {
-          let client;
-          try {
-            client = await MongoClient.connect(url, { useUnifiedTopology: true });
-            debug('Server connected');
-
-            const db = client.db(dbName);
-
-            const response = await db.collection('users').insertOne(user);
-
-            req.login(response.ops[0], () => {
-              res.redirect('/auth/profile');
-            });
-          } catch (err) {
-            debug(err.stack);
-          } finally {
-            await client.close();
-            debug('Connection closed');
-          }
-        } else {
-          res.redirect('/');
-        }
-      }());
-    });
+    .post(userSignUp);
 
   authRouter.route('/signIn')
     // si un usuario se registro local strategy agrego user a req
@@ -56,10 +33,6 @@ function router(nav) {
       }
     })
 
-    // le paso los datos a password para authenticate password.authenticate()
-    // paso la strategy, ej: local, facebook, tweeter (lo que haya configurado en strategy)
-    // le paso un objeto con los redirecto onsuccess y onfailure
-    // ahora cuando hago signin le paso la informacion a local.strategy para que la maneje
     .post(passport.authenticate('local',
       {
         successRedirect: '/auth/profile',
@@ -67,18 +40,10 @@ function router(nav) {
       }));
 
   authRouter.route('/profile')
-    // utilizo un middleware para que cada vez que llegue a '.../profile'
-    // verifique si la validacion devolvio un usuario en local.strategy,js
-    // si devolvio es que el usuario esta en la base de datos
-    // sino no esta registrado y por lo tando lo devuelve '.../' que es signUp singIn
+
     .all((req, res, next) => {
-      if (req.user) {
-        debug(req.user);
-        next();
-      } else {
-        debug('redirigio');
-        res.redirect('/');
-      }
+      debug('from authRouter profile');
+      userAuthenticationMiddleware(req, res, next);
     })
 
     .get((req, res) => {
@@ -96,14 +61,8 @@ function router(nav) {
 
   authRouter.route('/logout')
     .all((req, res, next) => {
-      if (req.user) {
-        debug('logout')
-        debug(req.user);
-        next();
-      } else {
-        debug('redirigio');
-        res.redirect('/');
-      }
+      debug('from authRouter logout');
+      userAuthenticationMiddleware(req, res, next);
     })
 
     .get((req, res) => {
