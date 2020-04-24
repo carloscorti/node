@@ -8,6 +8,8 @@ function bookController(nav) {
     (async () => {
       let client;
       try {
+        const { _id } = req.user;
+
         client = await MongoClient.connect(url, { useUnifiedTopology: true });
         debug('Server connected');
 
@@ -15,7 +17,7 @@ function bookController(nav) {
 
         const col = db.collection('books');
 
-        const books = await col.find().toArray();
+        const books = await col.find({ user: _id }).toArray();
 
         res.render(
           'booksListViews', {
@@ -57,6 +59,7 @@ function bookController(nav) {
         );
       } catch (err) {
         debug(err.stack);
+        res.status(404).send('Sorry cant find that!<br><a href="/books">go back</a>');
       } finally {
         await client.close();
         debug('Connection closed');

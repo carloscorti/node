@@ -41,8 +41,9 @@ app.set('view engine', 'ejs');
 
 // defino la configuracion de nav que le voy a pasar el router
 const nav = [
-  { link: '/books', title: 'Books' },
+  { link: '/books', title: 'My Books' },
   { link: '/auth/profile', title: 'Profile' },
+  { link: '/bookshelf', title: 'Book Shelf' },
 ];
 
 // importo el modulo con el las rutas de los libros y paso nav como parmetro
@@ -61,6 +62,10 @@ const authRouter = require('./src/routes/authRouter')(nav);
 
 app.use('/auth', authRouter);
 
+const bookShelfRouter = require('./src/routes/bookSehlfRouter')(nav);
+
+app.use('/bookshelf', bookShelfRouter);
+
 app.get('/', (req, res) => {
   // si un usuario se registro local strategy agrego user a req
   // si es asi no muestra la pagina signin signup
@@ -75,6 +80,10 @@ app.get('/', (req, res) => {
       }
     );
   }
+});
+
+app.use((req, res, next) => {
+  res.status(404).send('Sorry cant find that!<br><a href="/">go back</a>');
 });
 
 const port = process.env.PORT || 3000;

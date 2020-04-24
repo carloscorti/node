@@ -111,7 +111,7 @@
                             <br>
                             <div class="col-md-2 col-sm-3 text-center">
                                 <a class="story-title" href="#"><img alt=""
-                                        src="https://picsum.photos/id/<%=Math.round(Math.random()*300)%>/100/100"
+                                        src="<%=book.cover%>"
                                         style="width:100px;height:100px" class="img-circle"></a>
                             </div>
                             <div class="col-md-10 col-sm-9">
@@ -120,7 +120,7 @@
                                     <div class="col-xs-9">
                                         <h4><span class="label label-default">Author: <%=book.author%></span></h4>
                                         <h4>
-                                            <small style="font-family:courier,'new courier';" class="text-muted"><%=book.genre%>                                        </h4>
+                                            <small style="font-family:courier,'new courier';" class="text-muted"><%-book.content%>                                        </h4>
                                     </div>
                                     <div class="col-xs-3"></div>
                                 </div>
